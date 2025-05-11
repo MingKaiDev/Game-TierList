@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const navigate = useNavigate()
 const initialBlogs = [
   {
     id: 1,
@@ -25,7 +24,7 @@ const initialBlogs = [
 
 const Blog = () => {
   const [blogs, setBlogs] = useState(initialBlogs)
-
+  const navigate = useNavigate()
   return (
     <div style={styles.container}>
       <div style={styles.header}>
