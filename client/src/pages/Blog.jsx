@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+const navigate = useNavigate()
 const initialBlogs = [
   {
     id: 1,
@@ -29,7 +30,7 @@ const Blog = () => {
     <div style={styles.container}>
       <div style={styles.header}>
         <h2>Game Blog Posts</h2>
-        <button style={styles.addButton} onClick={() => useNavigate('/newblog')}>➕ Add New Blog</button>
+        <button style={styles.addButton} onClick={() => navigate('/newblog')}>➕ Add New Blog</button>
       </div>
       <div style={styles.blogList}>
         {blogs.map((blog) => (
