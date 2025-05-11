@@ -14,7 +14,7 @@ app.use(cors({
 app.use(express.json());
 
 //Routes
-app.use('/api/blogs',blogroutes)
+app.use('/api/blogs',blogRoutes)
 
 
 app.get("/api/hello", (req, res) => {
