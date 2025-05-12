@@ -75,6 +75,8 @@ const styles = {
     borderRadius: '8px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
     gap: '1rem',
+    alignItems: 'center',
+    width: '100%', // or set a maxWidth if needed
   },
   image: {
     width: '100px',
@@ -85,17 +87,25 @@ const styles = {
   info: {
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    flex: 1,
+    overflow: 'hidden',
+    wordWrap: 'break-word',
+    color: 'white',
   },
   title: {
     margin: 0,
     fontSize: '1.2rem',
+    fontWeight: 'bold',
+    color: 'white',
+    textDecoration: 'none',
   },
+
   rating: {
     margin: 0,
     fontSize: '1rem',
     color: '#00C800',
-  },
+  }
 }
 
 export default Blog
