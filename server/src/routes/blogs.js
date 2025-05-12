@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   const { title, rating, content } = req.body
   try {
-    const docRef = await db.collection('blogs').add({ title, rating, image })
+    const docRef = await db.collection('blogs').add({ title, rating, content })
     res.status(201).json({ id: docRef.id })
   } catch (error) {
     res.status(500).json({ error: error.message })
