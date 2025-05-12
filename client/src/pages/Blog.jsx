@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import BlogCard from '../components/BlogCard'
 
 const Blog = () => {
   const [blogs, setBlogs] = useState([])
@@ -34,13 +35,7 @@ const Blog = () => {
       ) : (
         <div style={styles.blogList}>
           {blogs.map((blog) => (
-            <div key={blog.id} style={styles.card}>
-              <img src={blog.image} alt={blog.title} style={styles.image} />
-              <div style={styles.info}>
-                <h3 style={styles.title}>{blog.title}</h3>
-                <p style={styles.rating}>Rating: {blog.rating}/10</p>
-              </div>
-            </div>
+            <BlogCard key={blog.id} blog={blog} />
           ))}
         </div>
       )}
