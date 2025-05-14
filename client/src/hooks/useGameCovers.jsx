@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 
 const useGameCovers = (title) => {
   const [coverUrl, setCoverUrl] = useState(null)
+  const [source, setSource] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -15,11 +16,12 @@ const useGameCovers = (title) => {
         const data = await res.json()
         if (res.ok && data.coverUrl) {
           setCoverUrl(data.coverUrl)
+          setSource(data.source || null)
         } else {
           throw new Error(data.error || 'No cover found')
         }
       } catch (err) {
-        console.error(err)
+        console.error('Failed to fetch cover:', err)
         setError(err)
       } finally {
         setLoading(false)
@@ -29,8 +31,7 @@ const useGameCovers = (title) => {
     fetchCover()
   }, [title])
 
-  return { coverUrl, loading, error }
+  return { coverUrl, source, loading, error }
 }
-
 
 export default useGameCovers

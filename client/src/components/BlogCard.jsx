@@ -1,46 +1,78 @@
-import { Link } from 'react-router-dom'
 import useGameCovers from '../hooks/useGameCovers'
 
-/* convert same way for the label */
-const formatDate = val => {
-  if (!val) return ''
-  if (typeof val === 'object' && '_seconds' in val)
-    return new Date(val._seconds * 1000).toLocaleDateString()
-  return new Date(val).toLocaleDateString()
-}
-
 const BlogCard = ({ blog }) => {
-  const { coverUrl, loading } = useGameCovers(blog.title)
+  const { coverUrl, source, loading } = useGameCovers(blog.title)
 
   return (
     <div style={styles.card}>
       {loading ? (
         <div style={styles.imgPlaceholder} />
       ) : (
-        <img src={coverUrl} alt={blog.title} style={styles.img} />
+        source === 'cover' ? (
+          <img src={coverUrl} alt={blog.title} style={styles.image} />
+        ) : (
+          <div style={styles.imgPlaceholder} />
+        )
       )}
 
       <div style={styles.info}>
         <h3 style={styles.title}>{blog.title}</h3>
-        <p style={styles.date}>{formatDate(blog.date)}</p>
+        <p style={styles.date}>{new Date(blog.date).toLocaleDateString()}</p>
         <p style={styles.snippet}>This is a short summary of the blog.</p>
-        <Link to={`/blog/${encodeURIComponent(blog.title)}`} style={styles.link}>
-          Read More
-        </Link>
+        <a href={`/blog/${encodeURIComponent(blog.title)}`} style={styles.link}>
+          Read More
+        </a>
       </div>
     </div>
   )
 }
 
 const styles = {
-  card: { display: 'flex', background: '#fff', color: '#000', border: '2px solid #ccc', borderRadius: 6, padding: '1rem', gap: '1.5rem', maxWidth: 700 },
-  img: { width: 120, height: 160, objectFit: 'cover', borderRadius: 4 },
-  imgPlaceholder: { width: 120, height: 160, background: '#444', borderRadius: 4 },
-  info: { flex: 1, display: 'flex', flexDirection: 'column', gap: '0.25rem' },
-  title: { margin: 0, fontSize: '1.2rem', fontWeight: 700 },
-  date: { margin: 0, fontSize: '0.85rem', color: '#888' },
-  snippet: { margin: '0.5rem 0', fontSize: '0.95rem', color: '#333' },
-  link: { marginTop: 'auto', color: '#007bff', textDecoration: 'none' },
+  card: {
+    display: 'flex',
+    background: '#1e1e1e',
+    padding: '1rem',
+    borderRadius: '10px',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
+    gap: '1rem',
+    color: '#fff',
+  },
+  image: {
+    width: '100px',
+    height: '140px',
+    objectFit: 'cover',
+    borderRadius: '6px',
+  },
+  imgPlaceholder: {
+    width: '100px',
+    height: '140px',
+    backgroundColor: '#333',
+    borderRadius: '6px',
+  },
+  info: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  title: {
+    fontSize: '1.2rem',
+    fontWeight: 'bold',
+  },
+  date: {
+    fontSize: '0.85rem',
+    color: '#aaa',
+  },
+  snippet: {
+    margin: '0.5rem 0',
+    fontSize: '0.95rem',
+    color: '#ccc',
+  },
+  link: {
+    color: '#00C800',
+    textDecoration: 'none',
+    fontWeight: 'bold',
+  },
 }
 
 export default BlogCard
