@@ -61,7 +61,7 @@ const Home = () => {
       <h1 style={styles.heading}>🌟 Featured</h1>
 
       <div style={styles.carousel}>
-        <button onClick={() => shift(-1)} style={styles.arrow}>◀</button>
+        <button onClick={() => shift(-1)} style={{ ...styles.arrow, left: '-40px' }}>◀</button>
 
         {loading ? (
           <p style={{ color: '#fff' }}>Loading…</p>
@@ -92,7 +92,7 @@ const Home = () => {
           </div>
         )}
 
-        <button onClick={() => shift(1)} style={styles.arrow}>▶</button>
+        <button onClick={() => shift(1)}  style={{ ...styles.arrow, right:'-40px' }}>▶</button>
       </div>
 
       {!loading && blogs.length > 0 && (
@@ -115,9 +115,9 @@ const styles = {
   page:   { paddingTop:'100px', textAlign:'center', background:'#0d1117', minHeight:'100vh' },
   heading:{ fontSize:'2rem', color:'#fff', marginBottom:'1rem' },
 
-  carousel:{ display:'flex', alignItems:'center', justifyContent:'center', gap:'2rem' },
+  carousel:{ position:'relative' ,width:'100%', maxWidth:'1600px',margin:'0 auto' },
 
-  frame:  { position:'relative', width:'1000px', height:'500px' },
+  frame:  { position:'relative', width:'100%', aspectRatio:'2/1',overflow:'hidden' },
 
   card:   { position:'absolute', top:0, left:0, width:'100%', height:'100%',
             borderRadius:'12px', overflow:'hidden',
@@ -134,8 +134,7 @@ const styles = {
   btn:    { padding:'.5rem 1rem', background:'#00C800', color:'#fff',
             border:'none', borderRadius:'6px', cursor:'pointer', fontWeight:600 },
 
-  arrow:  { fontSize:'2.2rem', background:'transparent', border:'none',
-            color:'#fff', cursor:'pointer' },
+  arrow:  { position:'absolute',  top:'50%',  transform:'translateY(-50%)',  fontSize:'2.5rem',  padding:0,  background:'transparent',  border:'none', color:'#fff',  cursor:'pointer',  userSelect:'none', },
 
   dots:   { display:'flex', justifyContent:'center', gap:'.5rem', marginTop:'1rem' },
   dot:    { width:'12px', height:'12px', borderRadius:'50%', cursor:'pointer',
