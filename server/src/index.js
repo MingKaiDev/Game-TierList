@@ -3,6 +3,7 @@ const cors = require("cors");
 const blogRoutes = require('./routes/blogs')
 const coverRoutes = require('./routes/covers')
 const pingRoute = require('./routes/ping')
+const artworkRoute = require('./routes/artwork')
 
 require("dotenv").config();
 
@@ -20,11 +21,14 @@ app.use(express.json());
 app.use('/api/blogs',blogRoutes)
 app.use('/api/cover', coverRoutes)
 app.use('/api/ping', pingRoute)
+app.use('/api/artwork', artworkRoute)
 
 app.get("/api/hello", (req, res) => {
   res.json({ message: "Hello from backend!" });
 });
-
+app.get("/", (req,res) => {
+  res.json({message: "App is Running"})
+})
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
