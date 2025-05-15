@@ -8,6 +8,7 @@ const NewBlog = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
     const newBlog = {
       title,
       rating: parseFloat(rating),
@@ -17,20 +18,31 @@ const NewBlog = () => {
     try {
       const auth = getAuth()
       const token = await auth.currentUser.getIdToken()
-      await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/blogs`, {
+
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/blogs`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,  // <- IMPORTANT
+        },
         body: JSON.stringify(newBlog),
       })
+
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.message || 'Failed to create blog')
+      }
+
       alert('Blog created!')
       setTitle('')
       setRating('')
-      setImage('')
       setContent('')
     } catch (err) {
       console.error('Failed to create blog:', err)
+      alert('Submission failed.')
     }
   }
+
 
   return (
     <div style={styles.container}>
