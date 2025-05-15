@@ -17,7 +17,7 @@ const NewBlog = () => {
     try {
       const auth = getAuth()
       const token = await auth.currentUser.getIdToken()
-      fetch(`${import.meta.env.VITE_BACKEND_URL}/api/blogs`, {
+      await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/blogs`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newBlog),
