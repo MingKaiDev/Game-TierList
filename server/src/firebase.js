@@ -20,9 +20,11 @@ if (process.env.FIREBASE_PRIVATE_KEY) {
   serviceAccount = require('../firebase-service-account.json')
 }
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-})
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  })
+}
 
 const db = admin.firestore()
 module.exports = { db }

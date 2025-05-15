@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import BlogCard from '../components/BlogCard'
+import { AuthCtx } from '../contexts/AuthContext'
 
 /* ───────── helper to normalise Firestore Timestamp OR ISO string ───────── */
 const getYear = dateVal => {
@@ -18,6 +19,7 @@ const Blog = () => {
   const [blogs, setBlogs] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedYear, setSelectedYear] = useState('All')
+  const { user } = useContext(AuthCtx)
   const navigate = useNavigate()
 
   /* ─── fetch once ─── */
@@ -50,10 +52,13 @@ const Blog = () => {
     <div style={styles.layout}>
       <div style={styles.columnLeft}>
         <div style={styles.header}>
-          <h2 style={styles.heading}>Game Blog Posts</h2>
-          <button style={styles.addBtn} onClick={() => navigate('/newblog')}>
-            ➕ Add New Blog
-          </button>
+          <h2 style={styles.heading}>Video Game Reviews</h2>
+          {user && (
+            <button style={styles.addBtn} onClick={() => navigate('/newblog')}>
+              ➕ Add New Blog
+            </button>
+          )}
+
         </div>
 
         {loading ? (

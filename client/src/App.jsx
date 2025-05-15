@@ -7,10 +7,16 @@ import TierList from './pages/TierList'
 import NewBlog from './pages/NewBlog'
 import BlogDetail from './pages/BlogDetail'
 import { useEffect } from 'react'
-
+import { AuthCtx } from './contexts/AuthContext'
 
 
 const backendURL = import.meta.env.VITE_BACKEND_URL;
+
+function PrivateRoute({ children }) {
+  const { user, ready } = useContext(AuthCtx)
+  if (!ready) return null            // or a spinner
+  return user ? children : <Navigate to="/login" replace />
+}
 
 const App = () => {
   useEffect(() => {
@@ -25,7 +31,9 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/tierlist" element={<TierList />} />
-        <Route path="/newblog" element={<NewBlog />} />
+        <Route path="/newblog" element={
+          <PrivateRoute><NewBlog /></PrivateRoute>
+        } />
         <Route path="/blog/:title" element={<BlogDetail />} />
 
       </Routes>

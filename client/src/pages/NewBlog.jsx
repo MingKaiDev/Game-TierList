@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { getAuth } from 'firebase/auth'
 
 const NewBlog = () => {
   const [title, setTitle] = useState('')
@@ -14,7 +15,9 @@ const NewBlog = () => {
     }
 
     try {
-      await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/blogs`, {
+      const auth = getAuth()
+      const token = await auth.currentUser.getIdToken()
+      fetch(`${import.meta.env.VITE_BACKEND_URL}/api/blogs`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newBlog),

@@ -1,9 +1,12 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { AuthCtx } from '../contexts/AuthContext'
+import { logout } from '../firebaseAuth'
 
 const Navbar = () => {
   const location = useLocation()
   const [scrolled, setScrolled] = useState(false)
+  const { user } = useContext(AuthCtx)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -13,38 +16,44 @@ const Navbar = () => {
 
   return (
     <div style={{ paddingTop: '60px' }}>
-    <nav style={{
-      ...styles.navbar,
-      ...(scrolled ? styles.navbarScrolled : {}),
-    }}>
-      {/* Left nav */}
-      <div style={styles.navLeft}>
-        {navItem("/", "Home", location)}
-        {navItem("/blog", "Blog", location)}
-        {navItem("/tierlist", "Tier List", location)}
-      </div>
+      <nav style={{
+        ...styles.navbar,
+        ...(scrolled ? styles.navbarScrolled : {}),
+      }}>
+        {/* Left nav */}
+        <div style={styles.navLeft}>
+          {navItem("/", "Home", location)}
+          {navItem("/blog", "Blog", location)}
+          {navItem("/tierlist", "Tier List", location)}
+        </div>
 
-      {/* Center logo */}
-      <div style={styles.logoContainer}>
-        <img
-          src="/logo.png"
-          alt="Kai Tierlist Logo"
-          style={{
-            height: scrolled ? '60px' : '80px',
-            transition: 'height 0.3s ease',
-          }}
-        />
-        <span style={{
-          ...styles.title,
-          fontSize: scrolled ? '2rem' : '2.75rem',
-        }}>
-          Game Tier List
-        </span>
-      </div>
+        {/* Center logo */}
+        <div style={styles.logoContainer}>
+          <img
+            src="/logo.png"
+            alt="Kai Tierlist Logo"
+            style={{
+              height: scrolled ? '60px' : '80px',
+              transition: 'height 0.3s ease',
+            }}
+          />
+          <span style={{
+            ...styles.title,
+            fontSize: scrolled ? '2rem' : '2.75rem',
+          }}>
+            Game Tier List
+          </span>
+        </div>
 
-      {/* Right placeholder for spacing or future links */}
-      <div style={styles.navRight}></div>
-    </nav>
+        {/* Right placeholder for spacing or future links */}
+        <div style={styles.navRight}>
+          <div>
+            {user
+              ? <button onClick={logout} style={styles.authBtn}>Logout</button>
+              : <Link to="/login" style={styles.authBtn}>Login</Link>}
+          </div>
+        </div>
+      </nav>
     </div>
   )
 }

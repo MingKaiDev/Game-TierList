@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const { db } = require('../firebase')
 const fetch = require('node-fetch')
+const checkAuth = require('../middleware/checkAuth')
 
 /* ───── IGDB Image Validator ───── */
 async function getCoverImageId(title) {
@@ -56,6 +57,8 @@ router.get('/', async (req, res) => {
 /* ───── POST Create Blog ───── */
 router.post('/', async (req, res) => {
   const { title, rating, content } = req.body
+    const uid = req.user.uid                       // from verified token
+  const now = new Date()
 
   if (!title || !rating || !content) {
     return res.status(400).json({ error: 'Missing required fields' })
@@ -72,6 +75,8 @@ router.post('/', async (req, res) => {
       rating,
       content,
       date: new Date().toISOString(),
+            authorUid: uid,
+
     })
 
     res.status(201).json({ id: newDoc.id })
