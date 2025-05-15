@@ -1,5 +1,5 @@
 // server/src/middleware/checkAuth.js
-const admin = require('../firebaseAdmin')
+const admin = require('../firebase')
 
 module.exports = async function checkAuth(req, res, next) {
   const header = req.headers.authorization || ''
