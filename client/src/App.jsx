@@ -8,7 +8,7 @@ import NewBlog from './pages/NewBlog'
 import BlogDetail from './pages/BlogDetail'
 import { useEffect } from 'react'
 import { AuthCtx } from './contexts/AuthContext'
-
+import Login from './pages/Login'
 
 const backendURL = import.meta.env.VITE_BACKEND_URL;
 
@@ -35,7 +35,7 @@ const App = () => {
           <PrivateRoute><NewBlog /></PrivateRoute>
         } />
         <Route path="/blog/:title" element={<BlogDetail />} />
-
+        <Route path="/login" element={<Login />} />
       </Routes>
     </>
   )
