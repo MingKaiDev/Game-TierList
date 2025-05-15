@@ -6,7 +6,7 @@ import Blog from './pages/Blog'
 import TierList from './pages/TierList'
 import NewBlog from './pages/NewBlog'
 import BlogDetail from './pages/BlogDetail'
-import { useEffect } from 'react'
+import { useEffect,useContext } from 'react'
 import { AuthCtx } from './contexts/AuthContext'
 import Login from './pages/Login'
 
