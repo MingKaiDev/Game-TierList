@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { AuthCtx } from '../contexts/AuthContext'
 import { logout } from '../firebaseAuth'
+import { useContext } from 'react';
 
 const Navbar = () => {
   const location = useLocation()
