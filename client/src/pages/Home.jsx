@@ -79,7 +79,7 @@ const Home = () => {
                 <img src={b.artworkUrl} alt={b.title} style={styles.img}/>
                 <div style={styles.overlay}>
                   <h3 style={styles.title}>{b.title}</h3>
-                  <p  style={styles.snip}>{(b.content || '').slice(0,70)}…</p>
+                  <p  style={styles.snip}>{(b.summary || '').slice(0,70)}…</p>
                   <button
                     style={styles.btn}
                     onClick={() => navigate(`/blog/${encodeURIComponent(b.title)}`)}

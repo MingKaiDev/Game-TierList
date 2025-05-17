@@ -18,7 +18,7 @@ const BlogCard = ({ blog }) => {
       <div style={styles.info}>
         <h3 style={styles.title}>{blog.title}</h3>
         <p style={styles.date}>{new Date(blog.date).toLocaleDateString()}</p>
-        <p style={styles.snippet}>This is a short summary of the blog.</p>
+        <p style={styles.snippet}>{blog.summary}</p>
         <a href={`/blog/${encodeURIComponent(blog.title)}`} style={styles.link}>
           Read More
         </a>

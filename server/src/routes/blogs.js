@@ -74,7 +74,7 @@ router.get('/', async (req, res) => {
 
 /* ───── POST Create Blog ───── */
 router.post('/',verifyToken, async (req, res) => {
-  const { title, rating, content } = req.body
+  const { title, rating, content,summary } = req.body
     const uid = req.user.uid                       // from verified token
   const now = new Date()
 
@@ -92,6 +92,7 @@ router.post('/',verifyToken, async (req, res) => {
       title,
       rating,
       content,
+      summary,
       date: new Date().toISOString(),
             authorUid: uid,
 
