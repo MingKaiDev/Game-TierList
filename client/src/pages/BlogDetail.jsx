@@ -70,7 +70,7 @@ const BlogDetail = () => {
         </div>
       )}
       <div style={{ marginTop: '3rem' }}>
-        <DiscussionEmbed shortname="your-disqus-shortname" config={disqusConfig} />
+        <DiscussionEmbed shortname="game-tierlist" config={disqusConfig} />
       </div>
 
     </div>
