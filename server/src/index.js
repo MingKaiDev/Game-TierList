@@ -4,6 +4,7 @@ const blogRoutes = require('./routes/blogs')
 const coverRoutes = require('./routes/covers')
 const pingRoute = require('./routes/ping')
 const artworkRoute = require('./routes/artwork')
+const detailsRoute = require('./routes/details')
 
 require("dotenv").config();
 
@@ -22,6 +23,7 @@ app.use('/api/blogs',blogRoutes)
 app.use('/api/cover', coverRoutes)
 app.use('/api/ping', pingRoute)
 app.use('/api/artwork', artworkRoute)
+app.use('/api/details', detailsRoute)
 
 app.get("/api/hello", (req, res) => {
   res.json({ message: "Hello from backend!" });
