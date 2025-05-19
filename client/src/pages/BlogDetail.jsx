@@ -37,7 +37,7 @@ const BlogDetail = () => {
       )}
       <h1>{blog.title}</h1>
       <p style={styles.rating}>Rating: {blog.rating}/10</p>
-      <p style={styles.content}>{blog.content}</p>
+      
 
       {igdbInfo && igdbInfo.genres.length > 0 && (
         <div style={styles.section}>
@@ -69,6 +69,7 @@ const BlogDetail = () => {
           </div>
         </div>
       )}
+      <p style={styles.content}>{blog.content}</p>
       <div style={{ marginTop: '3rem' }}>
         <DiscussionEmbed shortname="game-tierlist" config={disqusConfig} />
       </div>
