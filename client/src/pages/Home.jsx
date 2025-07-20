@@ -8,6 +8,7 @@ const Home = () => {
   const [loading, setLoad] = useState(true)
   const [current, setCurr] = useState(0)
   const navigate = useNavigate()
+  const delay = (ms) => new Promise(res => setTimeout(res, ms));
 
   useEffect(() => {
     const fetchLatest = async () => {
@@ -16,23 +17,27 @@ const Home = () => {
         const data = await r.json()
 
         const sorted = data
-          .filter(b => b.date)
+          .filter(b => typeof b.rating === 'number' && b.rating >= 7 && b.date)
           .sort((a, b) => new Date(b.date) - new Date(a.date))
           .slice(0, 5)
 
-        const enriched = await Promise.all(
-          sorted.map(async blog => {
-            try {
-              const res = await fetch(
-                `${import.meta.env.VITE_BACKEND_URL}/api/artwork?title=${encodeURIComponent(blog.title)}`
-              )
-              const { coverUrl } = await res.json()
-              return { ...blog, artworkUrl: coverUrl || null }
-            } catch {
-              return { ...blog, artworkUrl: null }
-            }
-          })
-        )
+
+        const enriched = [];
+
+        for (const blog of sorted) {
+          try {
+            const res = await fetch(
+              `${import.meta.env.VITE_BACKEND_URL}/api/artwork?title=${encodeURIComponent(blog.title)}`
+            );
+            const { coverUrl } = await res.json();
+            enriched.push({ ...blog, artworkUrl: coverUrl || null });
+          } catch (err) {
+            console.warn(`Artwork fetch failed for "${blog.title}"`, err.message);
+            enriched.push({ ...blog, artworkUrl: null });
+          }
+
+          await delay(500); // throttle each request
+        }
 
         setBlogs(enriched)
       } catch (err) {
@@ -109,28 +114,38 @@ const Home = () => {
       )}
 
       <div style={styles.dashboard}>
+        {/* 🔹 Recently Added */}
         <div style={styles.widget}>
           <h2>Recently Added</h2>
           <ul style={styles.list}>
-            {blogs.slice(0, 3).map((b, i) => (
-              <li key={i} style={styles.listItem}>
-                <strong>{b.title}</strong> – {new Date(b.date).toLocaleDateString()}
-              </li>
-            ))}
+            {[...blogs]
+              .sort((a, b) => new Date(b.date) - new Date(a.date))
+              .slice(0, 3)
+              .map((b, i) => (
+                <li key={i} style={styles.listItem}>
+                  <strong>{b.title}</strong> – {new Date(b.date).toLocaleDateString()}
+                </li>
+              ))}
           </ul>
         </div>
 
+        {/* 🔹 Top Rated */}
         <div style={styles.widget}>
           <h2>Top Rated</h2>
           <ul style={styles.list}>
-            {[...blogs].sort((a, b) => b.rating - a.rating).slice(0, 3).map((b, i) => (
-              <li key={i} style={styles.listItem}>
-                <strong>{b.title}</strong> – {b.rating}/10
-              </li>
-            ))}
+            {[...blogs]
+              .filter(b => typeof b.rating === 'number')
+              .sort((a, b) => b.rating - a.rating)
+              .slice(0, 3)
+              .map((b, i) => (
+                <li key={i} style={styles.listItem}>
+                  <strong>{b.title}</strong> – {b.rating}/10
+                </li>
+              ))}
           </ul>
         </div>
       </div>
+
     </div>
   )
 }

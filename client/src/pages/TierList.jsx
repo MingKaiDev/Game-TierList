@@ -49,14 +49,16 @@ const Card = ({ blog }) => {
   return (
     <div style={styles.card}>
       {loading ? (
-        <div style={styles.imgPlaceholder} />
-      ) : (
-        source === 'cover' ? (
-          <img src={coverUrl} alt={blog.title} style={styles.image} />
-        ) : (
-          <div style={styles.imgPlaceholder} />
-        )
-      )}
+  <div style={styles.imgPlaceholder} />
+) : (
+  source === 'cover' ? (
+    <img src={coverUrl} alt={blog.title} style={styles.image} />
+  ) : (
+    <div style={styles.imgPlaceholder}>
+      <span style={styles.fallbackText}>No Cover</span>
+    </div>
+  )
+)}
       <div style={styles.cardTitle}>{blog.title}</div>
     </div>
   )
@@ -121,6 +123,13 @@ const styles = {
     fontSize: '0.9rem',
     color: '#fff',
   },
+  fallbackText: {
+  fontSize: '0.7rem',
+  color: '#aaa',
+  textAlign: 'center',
+  paddingTop: '2.5rem'
+},
+
 }
 
 export default TierList
