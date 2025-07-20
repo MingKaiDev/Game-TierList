@@ -10,6 +10,10 @@ async function getCoverImageId(title) {
   const IGDB_CLIENT_ID = process.env.IGDB_CLIENT_ID
   const IGDB_ACCESS_TOKEN = process.env.IGDB_ACCESS_TOKEN
 
+  function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
   if (!IGDB_CLIENT_ID || !IGDB_ACCESS_TOKEN) {
     console.error('Missing IGDB credentials')
     return null
