@@ -106,4 +106,36 @@ router.post('/',verifyToken, async (req, res) => {
   }
 })
 
+/* ───── PATCH Update Blog ───── */
+router.patch('/:id', verifyToken, async (req, res) => {
+  const { id } = req.params
+  const { content, rating, gameplayTime } = req.body
+
+  try {
+    const blogRef = db.collection('blogs').doc(id)
+    const blogSnap = await blogRef.get()
+
+    if (!blogSnap.exists) {
+      return res.status(404).json({ error: 'Blog not found' })
+    }
+
+    const blog = blogSnap.data()
+    if (blog.authorUid !== req.user.uid) {
+      return res.status(403).json({ error: 'Forbidden: Not your blog' })
+    }
+
+    await blogRef.update({
+      content,
+      rating,
+      gameplayTime,
+    })
+
+    res.status(200).json({ success: true })
+  } catch (err) {
+    console.error('Blog update failed:', err)
+    res.status(500).json({ error: 'Failed to update blog' })
+  }
+})
+
+
 module.exports = router
