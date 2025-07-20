@@ -6,6 +6,7 @@ import Blog from './pages/Blog'
 import TierList from './pages/TierList'
 import NewBlog from './pages/NewBlog'
 import BlogDetail from './pages/BlogDetail'
+import EditBlog from './pages/EditBlog'
 import { useEffect,useContext } from 'react'
 import { AuthCtx } from './contexts/AuthContext'
 import Login from './pages/Login'
@@ -34,6 +35,10 @@ const App = () => {
         <Route path="/newblog" element={
           <PrivateRoute><NewBlog /></PrivateRoute>
         } />
+        <Route path="/EditBlog/:id" element={
+          <PrivateRoute><EditBlog /></PrivateRoute>
+          } />
+
         <Route path="/blog/:title" element={<BlogDetail />} />
         <Route path="/login" element={<Login />} />
       </Routes>

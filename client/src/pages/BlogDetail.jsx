@@ -1,11 +1,14 @@
-import { useParams } from 'react-router-dom'
+import { useParams,useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { DiscussionEmbed } from 'disqus-react'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
 
 const BlogDetail = () => {
   const { title } = useParams()
   const [blog, setBlog] = useState(null)
   const [igdbInfo, setIgdbInfo] = useState(null)
+  const navigate = useNavigate()
+const [user, setUser] = useState(null)
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -23,7 +26,13 @@ const BlogDetail = () => {
     fetchBlog()
     fetchDetails()
   }, [title])
-
+  useEffect(() => {
+  const auth = getAuth()
+  const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    setUser(firebaseUser)
+  })
+  return () => unsubscribe()
+}, [])
   if (!blog) return <p style={{ color: 'white' }}>Loading blog...</p>
   const disqusConfig = {
     url: window.location.href,
@@ -43,7 +52,7 @@ const BlogDetail = () => {
         </p>
       )}
 
-      {igdbInfo && igdbInfo.genres.length > 0 && (
+      {Array.isArray(igdbInfo?.genres) && igdbInfo.genres.length > 0 && (
         <div style={styles.section}>
           <strong style={styles.label}>Genres:</strong>
           <div style={styles.badgeGroup}>
@@ -74,6 +83,14 @@ const BlogDetail = () => {
         </div>
       )}
       <p style={styles.content}>{blog.content}</p>
+      {user?.uid === blog.authorUid && (
+  <button
+    onClick={() => navigate(`/EditBlog/${blog.id}`)}
+    style={{ marginTop: '2rem', padding: '0.5rem 1rem' }}
+  >
+    ✏️ Edit Blog
+  </button>
+)}
       <div style={{ marginTop: '3rem' }}>
         <DiscussionEmbed shortname="game-tierlist" config={disqusConfig} />
       </div>
