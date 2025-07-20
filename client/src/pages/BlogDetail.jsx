@@ -6,7 +6,7 @@ const BlogDetail = () => {
   const { title } = useParams()
   const [blog, setBlog] = useState(null)
   const [igdbInfo, setIgdbInfo] = useState(null)
-  
+
   useEffect(() => {
     const fetchBlog = async () => {
       const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/blogs?title=${encodeURIComponent(title)}`)
@@ -37,7 +37,11 @@ const BlogDetail = () => {
       )}
       <h1>{blog.title}</h1>
       <p style={styles.rating}>Rating: {blog.rating}/10</p>
-      
+      {blog.gameplayTime && (
+        <p style={{ ...styles.meta, marginTop: '0.5rem' }}>
+          Gameplay Time: {blog.gameplayTime}
+        </p>
+      )}
 
       {igdbInfo && igdbInfo.genres.length > 0 && (
         <div style={styles.section}>

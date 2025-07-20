@@ -6,6 +6,7 @@ const NewBlog = () => {
   const [rating, setRating] = useState('')
   const [summary, setSummary] = useState('')
   const [content, setContent] = useState('')
+  const [gameplayTime, setGameplayTime] = useState('')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -14,6 +15,7 @@ const NewBlog = () => {
       rating: parseFloat(rating),
       summary,
       content,
+      gameplayTime,
     }
 
     try {
@@ -59,6 +61,13 @@ const NewBlog = () => {
           step="0.1"
           min="1"
           max="10"
+          style={styles.input}
+        />
+        <input
+          type="text"
+          placeholder="Gameplay Duration (e.g. ~40 hours)"
+          value={gameplayTime}
+          onChange={(e) => setGameplayTime(e.target.value)}
           style={styles.input}
         />
         <input
