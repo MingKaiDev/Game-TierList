@@ -62,7 +62,7 @@ const [user, setUser] = useState(null)
           </div>
         </div>
       )}
-      {igdbInfo && igdbInfo.developers.length > 0 && (
+      {Array.isArray(igdbInfo?.developers) && igdbInfo.developers.length > 0 && (
         <div style={styles.section}>
           <strong style={styles.label}>Developers:</strong>
           <div style={styles.badgeGroup}>
@@ -72,7 +72,7 @@ const [user, setUser] = useState(null)
           </div>
         </div>
       )}
-      {igdbInfo && igdbInfo.publishers.length > 0 && (
+      {Array.isArray(igdbInfo?.publishers) && igdbInfo.publishers.length > 0 && (
         <div style={styles.section}>
           <strong style={styles.label}>Publishers:</strong>
           <div style={styles.badgeGroup}>
