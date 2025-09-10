@@ -46,7 +46,7 @@ const Blog = () => {
   const [minRating, setMinRating] = useState(0)
   const [maxRating, setMaxRating] = useState(10)
   const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
+  const [pageSize, setPageSize] = useState(4) //Use this to set default
   const { user } = useContext(AuthCtx)
   const navigate = useNavigate()
 
@@ -64,7 +64,7 @@ const Blog = () => {
   }, [blogs])
 
   const filteredBlogs = useMemo(() => {
-    return blogs.filter(b => {
+    const filtered =  blogs.filter(b => {
       const year = getYear(b.date)?.toString()
       return (
         (selectedYear === 'All' || year === selectedYear) &&
@@ -72,6 +72,13 @@ const Blog = () => {
         b.rating >= minRating &&
         b.rating <= maxRating
       )
+    })
+
+    // Sort by date descending (latest first)
+    return filtered.sort((a, b) => {
+    const da = new Date(a.date._seconds ? a.date._seconds * 1000 : a.date)
+    const db = new Date(b.date._seconds ? b.date._seconds * 1000 : b.date)
+    return db - da
     })
   }, [blogs, selectedYear, titleQuery, minRating, maxRating])
 
@@ -135,7 +142,7 @@ const Blog = () => {
               <div style={styles.pageSizeWrap}>
                 <label style={styles.labelSmall}>Per page</label>
                 <select value={pageSize} onChange={e => setPageSize(Number(e.target.value))} style={styles.pageSizeSelect}>
-                  {[5, 10, 20, 50].map(n => <option key={n} value={n}>{n}</option>)}
+                  {[4, 8, 16, 32].map(n => <option key={n} value={n}>{n}</option>)}
                 </select>
               </div>
             </div>
