@@ -87,10 +87,10 @@ router.post('/',verifyToken, async (req, res) => {
   }
 
   try {
-    const hasCover = await getCoverImageId(title)
-    if (!hasCover) {
-      return res.status(400).json({ error: 'Invalid title — no IGDB image found' })
-    }
+    // const hasCover = await getCoverImageId(title)
+    // if (!hasCover) {
+    //   return res.status(400).json({ error: 'Invalid title — no IGDB image found' })
+    // }
 
     const newDoc = await db.collection('blogs').add({
       title,

@@ -38,6 +38,7 @@ const NewBlog = () => {
       setGameplayTime('')
     } catch (err) {
       console.error('Failed to create blog:', err)
+      
     }
   }
 
