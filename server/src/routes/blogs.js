@@ -60,7 +60,26 @@ router.get('/', async (req, res) => {
   try {
     const { title } = req.query
     const snapshot = await db.collection('blogs').get()
-    const blogs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    let blogs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+
+    // Check if user is authenticated
+    let isAuthenticated = false
+    const authHeader = req.headers.authorization
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const idToken = authHeader.split(' ')[1]
+      try {
+        await admin.auth().verifyIdToken(idToken)
+        isAuthenticated = true
+      } catch (err) {
+        // User is not authenticated, continue with filtering
+      }
+    }
+
+    // Filter out NSFW content if user is not authenticated
+    // Only authenticated users can see NSFW blogs
+    if (!isAuthenticated) {
+      blogs = blogs.filter(blog => blog.NSFW !== true)
+    }
 
     if (title) {
       const filtered = blogs.filter(b =>
@@ -78,8 +97,8 @@ router.get('/', async (req, res) => {
 
 /* ───── POST Create Blog ───── */
 router.post('/',verifyToken, async (req, res) => {
-  const { title, rating, content,summary,gameplayTime } = req.body
-    const uid = req.user.uid                       // from verified token
+  const { title, rating, content, summary, gameplayTime, NSFW } = req.body
+  const uid = req.user.uid                       // from verified token
   const now = new Date()
 
   if (!title || !rating || !content) {
@@ -98,9 +117,9 @@ router.post('/',verifyToken, async (req, res) => {
       content,
       summary,
       gameplayTime,
+      NSFW: Boolean(NSFW), // Ensure it's always a boolean
       date: new Date().toISOString(),
-            authorUid: uid,
-
+      authorUid: uid,
     })
 
     res.status(201).json({ id: newDoc.id })
@@ -113,7 +132,7 @@ router.post('/',verifyToken, async (req, res) => {
 /* ───── PATCH Update Blog ───── */
 router.patch('/:id', verifyToken, async (req, res) => {
   const { id } = req.params
-  const { content, rating, gameplayTime } = req.body
+  const { content, rating, gameplayTime, NSFW } = req.body
 
   try {
     const blogRef = db.collection('blogs').doc(id)
@@ -128,11 +147,18 @@ router.patch('/:id', verifyToken, async (req, res) => {
       return res.status(403).json({ error: 'Forbidden: Not your blog' })
     }
 
-    await blogRef.update({
+    const updateData = {
       content,
       rating,
       gameplayTime,
-    })
+    }
+
+    // Only update NSFW if it's provided in the request
+    if (NSFW !== undefined) {
+      updateData.NSFW = Boolean(NSFW)
+    }
+
+    await blogRef.update(updateData)
 
     res.status(200).json({ success: true })
   } catch (err) {
