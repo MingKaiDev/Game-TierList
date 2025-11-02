@@ -1,0 +1,106 @@
+/* client/src/styles/BlogDetail.css */
+
+.tome-container {
+    font-family: 'Cinzel', serif;
+    color: #EAEAEA;
+    padding: 2rem 4rem;
+    max-width: 900px;
+    margin: 2rem auto;
+    background-color: #1a1a1a; /* Slightly lighter than pure black for depth */
+    position: relative;
+    border: 12px solid #B89B72;
+    border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Cpath d='M0 0 H36 V36 H0 Z' fill='%231a1a1a'/%3E%3Cpath d='M2 18 C2 8.05 8.05 2 18 2 S34 8.05 34 18 27.95 34 18 34 2 27.95 2 18 Z' fill='%23B89B72'/%3E%3Cpath d='M4 18 C4 9.16 9.16 4 18 4 S32 9.16 32 18 26.84 32 18 32 4 26.84 4 18 Z' fill='%231a1a1a'/%3E%3C/svg%3E") 12 / 1 / 0 stretch;
+    box-shadow: 0 0 40px rgba(0,0,0,0.9);
+}
+
+.tome-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    border-bottom: 2px solid #B89B72;
+    padding-bottom: 1.5rem;
+    text-transform: uppercase;
+}
+
+.tome-title {
+    font-size: 3.5rem;
+    color: #EAEAEA;
+    text-shadow: 3px 3px 5px rgba(0,0,0,0.7);
+    letter-spacing: 0.2em;
+}
+
+.tome-meta {
+    font-size: 1rem;
+    color: #B89B72;
+    margin-top: 1rem;
+}
+
+.tome-content {
+    line-height: 1.8;
+    font-size: 1.1rem;
+    text-align: justify;
+}
+
+.tome-content p:first-of-type::first-letter {
+    float: left;
+    font-size: 5rem;
+    line-height: 0.8;
+    padding-top: 0.5rem;
+    padding-right: 0.5rem;
+    padding-left: 0.2rem;
+    font-weight: bold;
+    color: #B89B72;
+    text-shadow: 2px 2px 2px #000;
+}
+
+.tome-content blockquote {
+    border-left: 3px solid #B89B72;
+    margin: 1.5em 10px;
+    padding: 0.5em 10px;
+    background-color: rgba(0,0,0,0.2);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    font-style: italic;
+    color: #ccc;
+}
+
+.tome-content blockquote p {
+    display: inline;
+}
+
+.banner {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-bottom: 2px solid #B89B72;
+    margin-bottom: 2rem;
+}
+
+.section {
+    margin: 1.5rem 0;
+}
+
+.label {
+    color: #B89B72;
+    text-transform: uppercase;
+}
+
+.badge-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.badge {
+    background-color: #333;
+    color: #EAEAEA;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    border: 1px solid #444;
+    font-size: 0.9rem;
+}
+
+.discussion-section {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 2px solid #B89B72;
+}

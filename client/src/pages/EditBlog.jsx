@@ -11,6 +11,7 @@ const EditBlog = () => {
   const [content, setContent] = useState('')
   const [rating, setRating] = useState('')
   const [gameplayTime, setGameplayTime] = useState('')
+  const [nsfw, setNsfw] = useState(false)
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -29,6 +30,7 @@ const EditBlog = () => {
       setContent(blog.content || '')
       setRating(blog.rating || '')
       setGameplayTime(blog.gameplayTime || '')
+      setNsfw(Boolean(blog.NSFW))
       setLoading(false)
     }
 
@@ -44,7 +46,7 @@ const EditBlog = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ content, rating: parseFloat(rating), gameplayTime }),
+        body: JSON.stringify({ content, rating: parseFloat(rating), gameplayTime, NSFW: nsfw }),
       })
 
       if (!res.ok) {
@@ -91,6 +93,19 @@ const EditBlog = () => {
         placeholder="Gameplay Time (e.g. ~30 hours)"
         style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
       />
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+        <input
+          type="checkbox"
+          id="nsfw-edit"
+          checked={nsfw}
+          onChange={(e) => setNsfw(e.target.checked)}
+          style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+        />
+        <label htmlFor="nsfw-edit" style={{ color: 'white', fontSize: '1rem', cursor: 'pointer' }}>
+          NSFW Content (requires login to view)
+        </label>
+      </div>
 
       <button onClick={handleSubmit} style={{ padding: '0.6rem 1.2rem' }}>
         Save Changes

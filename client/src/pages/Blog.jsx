@@ -2,6 +2,8 @@ import React, { useEffect, useState, useMemo, useContext, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import BlogCard from '../components/BlogCard'
 import { AuthCtx } from '../contexts/AuthContext'
+import { getAuth } from 'firebase/auth'
+import { FaFeatherAlt, FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 
 const getYear = dateVal => {
   if (!dateVal) return null
@@ -44,19 +46,45 @@ const Blog = () => {
   const [selectedYear, setSelectedYear] = useState('All')
   const [titleQuery, setTitleQuery] = useState('')
   const [minRating, setMinRating] = useState(0)
-  const [maxRating, setMaxRating] = useState(10)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(4) //Use this to set default
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
   const { user } = useContext(AuthCtx)
   const navigate = useNavigate()
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/blogs`)
-      .then(r => r.json())
-      .then(setBlogs)
-      .catch(err => console.error('Failed to fetch blogs:', err))
-      .finally(() => setLoading(false))
+    const handleResize = () => setIsMobile(window.innerWidth <= 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   }, [])
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        // Prepare headers with authentication if user is logged in
+        const headers = { 'Content-Type': 'application/json' }
+        if (user) {
+          try {
+            const auth = getAuth()
+            const token = await auth.currentUser.getIdToken()
+            headers.Authorization = `Bearer ${token}`
+          } catch (err) {
+            console.warn('Failed to get auth token:', err)
+          }
+        }
+
+        const r = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/blogs`, { headers })
+        const data = await r.json()
+        setBlogs(data)
+      } catch (err) {
+        console.error('Failed to fetch blogs:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchBlogs()
+  }, [user])
 
   const years = useMemo(() => {
     const set = new Set(blogs.map(b => getYear(b.date)).filter(Boolean))
@@ -69,131 +97,210 @@ const Blog = () => {
       return (
         (selectedYear === 'All' || year === selectedYear) &&
         b.title.toLowerCase().includes(titleQuery.toLowerCase()) &&
-        b.rating >= minRating &&
-        b.rating <= maxRating
+        b.rating >= minRating
       )
     })
+    return filtered.sort((a, b) => new Date(b.date) - new Date(a.date))
+  }, [blogs, selectedYear, titleQuery, minRating])
 
-    // Sort by date descending (latest first)
-    return filtered.sort((a, b) => {
-    const da = new Date(a.date._seconds ? a.date._seconds * 1000 : a.date)
-    const db = new Date(b.date._seconds ? b.date._seconds * 1000 : b.date)
-    return db - da
-    })
-  }, [blogs, selectedYear, titleQuery, minRating, maxRating])
-
-  useEffect(() => { setPage(1) }, [selectedYear, titleQuery, minRating, maxRating, pageSize])
-
-  const totalPages = Math.max(1, Math.ceil(filteredBlogs.length / pageSize))
-  useEffect(() => { setPage(p => Math.min(p, totalPages)) }, [totalPages])
-
-  const pagedBlogs = useMemo(() => {
-    const start = (page - 1) * pageSize
-    return filteredBlogs.slice(start, start + pageSize)
+  const paginatedBlogs = useMemo(() => {
+    const startIndex = (page - 1) * pageSize
+    return filteredBlogs.slice(startIndex, startIndex + pageSize)
   }, [filteredBlogs, page, pageSize])
 
-  const resetFilters = () => {
-    setSelectedYear('All'); setTitleQuery(''); setMinRating(0); setMaxRating(10)
+  const totalPages = Math.ceil(filteredBlogs.length / pageSize)
+
+  const styles = {
+    container: {
+      padding: '2rem',
+      fontFamily: "'Cinzel', serif",
+      color: '#EAEAEA',
+    },
+    header: {
+      textAlign: 'center',
+      marginBottom: '2rem',
+    },
+    title: {
+      fontSize: '3rem',
+      fontWeight: 'bold',
+      textTransform: 'uppercase',
+      letterSpacing: '0.2rem',
+      color: '#B89B72',
+      textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+    },
+    controlsContainer: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      gap: '2rem',
+      marginBottom: '3rem',
+      padding: '2rem',
+      backgroundColor: 'rgba(16, 16, 16, 0.8)',
+      border: '1px solid #B89B72',
+      borderRadius: '8px',
+      boxShadow: '0 0 15px rgba(184, 155, 114, 0.2)',
+    },
+    controlGroup: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: '0.5rem',
+    },
+    label: {
+      fontSize: '1rem',
+      color: '#B89B72',
+      textTransform: 'uppercase',
+    },
+    input: {
+      backgroundColor: '#101010',
+      border: '1px solid #B89B72',
+      color: '#EAEAEA',
+      padding: '0.5rem',
+      borderRadius: '4px',
+      fontFamily: "'Cinzel', serif",
+      textAlign: 'center',
+    },
+    select: {
+      backgroundColor: '#101010',
+      border: '1px solid #B89B72',
+      color: '#EAEAEA',
+      padding: '0.5rem',
+      borderRadius: '4px',
+      fontFamily: "'Cinzel', serif",
+    },
+    sliderContainer: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '1rem',
+    },
+    blogList: {
+      display: 'grid',
+      gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)',
+      gap: '2rem',
+      marginBottom: '2rem',
+    },
+    paginationContainer: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: '1rem',
+      marginTop: '2rem',
+    },
+    paginationButton: {
+      background: 'transparent',
+      border: '1px solid #B89B72',
+      color: '#B89B72',
+      padding: '0.5rem 1rem',
+      cursor: 'pointer',
+      fontFamily: "'Cinzel', serif",
+      textTransform: 'uppercase',
+      transition: 'all 0.3s ease',
+    },
+    paginationButtonDisabled: {
+      border: '1px solid #444',
+      color: '#444',
+      cursor: 'not-allowed',
+    },
+    pageInfo: {
+      color: '#EAEAEA',
+    },
+    newBlogButton: {
+      position: 'fixed',
+      bottom: '2rem',
+      right: '2rem',
+      backgroundColor: '#B89B72',
+      color: '#101010',
+      padding: '1rem',
+      borderRadius: '50%',
+      border: 'none',
+      cursor: 'pointer',
+      fontSize: '1.5rem',
+      boxShadow: '0 0 15px rgba(184, 155, 114, 0.5)',
+      zIndex: 1000,
+    }
   }
 
-  const startIdx = filteredBlogs.length === 0 ? 0 : (page - 1) * pageSize + 1
-  const endIdx = Math.min(page * pageSize, filteredBlogs.length)
+  if (loading) {
+    return <div style={styles.container}>Loading chronicles...</div>
+  }
 
   return (
-    <div style={styles.layout}>
-      <div style={styles.columnLeft}>
-        <div style={styles.header}>
-          <h2 style={styles.heading}>Video Game Reviews</h2>
-          {user && (
-            <button style={styles.addBtn} onClick={() => navigate('/newblog')}>
-              ➕ Add New Blog
-            </button>
-          )}
+    <div style={styles.container}>
+      <header style={styles.header}>
+        <h1 style={styles.title}>The Archives</h1>
+      </header>
+
+      {user && (
+        <button style={styles.newBlogButton} onClick={() => navigate('/newblog')}>
+          <FaFeatherAlt />
+        </button>
+      )}
+
+      <div style={styles.controlsContainer}>
+        <div style={styles.controlGroup}>
+          <label htmlFor="title-search" style={styles.label}>Filter by Title</label>
+          <input
+            id="title-search"
+            type="text"
+            placeholder="Search title..."
+            value={titleQuery}
+            onChange={e => setTitleQuery(e.target.value)}
+            style={styles.input}
+          />
         </div>
-
-        {loading ? (
-          <p>Loading blogs…</p>
-        ) : (
-          <>
-            <div style={styles.blogList}>
-              {pagedBlogs.map(b => (
-                <LazyMount key={b.id} placeholderHeight={240}>
-                  <BlogCard blog={b} />
-                </LazyMount>
-              ))}
-              {filteredBlogs.length === 0 && <p>No results.</p>}
-            </div>
-
-            <div style={styles.pagination}>
-              <div style={styles.pageInfo}>
-                {filteredBlogs.length > 0
-                  ? `Showing ${startIdx}–${endIdx} of ${filteredBlogs.length}`
-                  : 'Showing 0 of 0'}
-              </div>
-
-              <div style={styles.pagerControls}>
-                <button style={styles.pagerBtn} onClick={() => setPage(1)} disabled={page === 1}>« First</button>
-                <button style={styles.pagerBtn} onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>‹ Prev</button>
-                <span style={styles.pageNumber}>Page {page} / {totalPages}</span>
-                <button style={styles.pagerBtn} onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}>Next ›</button>
-                <button style={styles.pagerBtn} onClick={() => setPage(totalPages)} disabled={page === totalPages}>Last »</button>
-              </div>
-
-              <div style={styles.pageSizeWrap}>
-                <label style={styles.labelSmall}>Per page</label>
-                <select value={pageSize} onChange={e => setPageSize(Number(e.target.value))} style={styles.pageSizeSelect}>
-                  {[4, 8, 16, 32].map(n => <option key={n} value={n}>{n}</option>)}
-                </select>
-              </div>
-            </div>
-          </>
-        )}
+        <div style={styles.controlGroup}>
+          <label htmlFor="year-select" style={styles.label}>Filter by Year</label>
+          <select id="year-select" value={selectedYear} onChange={e => setSelectedYear(e.target.value)} style={styles.select}>
+            <option value="All">All Years</option>
+            {years.map(y => <option key={y} value={y}>{y}</option>)}
+          </select>
+        </div>
+        <div style={styles.controlGroup}>
+          <label style={styles.label}>Minimum Rating</label>
+          <div style={styles.sliderContainer}>
+            <span style={{color: '#B89B72'}}>0</span>
+            <input
+              type="range"
+              min="0"
+              max="10"
+              step="1"
+              value={minRating}
+              onChange={e => setMinRating(e.target.value)}
+            />
+            <span style={{color: '#B89B72'}}>{minRating}</span>
+          </div>
+        </div>
       </div>
 
-      <div style={styles.columnRight}>
-        <h3 style={styles.panelTitle}>Filters</h3>
-        <label style={styles.label}>Search Title</label>
-        <input type="text" value={titleQuery} onChange={e => setTitleQuery(e.target.value)} placeholder="Search by title" style={styles.input} />
-        <label style={styles.label}>Filter by Year</label>
-        <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)} style={styles.select}>
-          <option value="All">All</option>
-          {years.map(y => <option key={y} value={y}>{y}</option>)}
-        </select>
-        <label style={styles.label}>Rating Range</label>
-        <div style={styles.rangeGroup}>
-          <input type="number" min={0} max={10} value={minRating} onChange={e => setMinRating(Number(e.target.value))} style={styles.rangeInput} />
-          <span style={{ margin: '0 0.5rem' }}>–</span>
-          <input type="number" min={0} max={10} value={maxRating} onChange={e => setMaxRating(Number(e.target.value))} style={styles.rangeInput} />
-        </div>
-        <button onClick={resetFilters} style={styles.resetBtn}>Reset Filters</button>
+      <div style={styles.blogList}>
+        {paginatedBlogs.map(blog => (
+          <LazyMount key={blog.id}>
+            <BlogCard blog={blog} />
+          </LazyMount>
+        ))}
       </div>
+
+      {totalPages > 1 && (
+        <div style={styles.paginationContainer}>
+          <button
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+            style={{...styles.paginationButton, ...(page === 1 && styles.paginationButtonDisabled)}}
+          >
+            <FaArrowLeft />
+          </button>
+          <span style={styles.pageInfo}>Page {page} of {totalPages}</span>
+          <button
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+            style={{...styles.paginationButton, ...(page === totalPages && styles.paginationButtonDisabled)}}
+          >
+            <FaArrowRight />
+          </button>
+        </div>
+      )}
     </div>
   )
-}
-
-const styles = {
-  layout: { display: 'flex', gap: '2rem', padding: '2rem', color: '#fff', background: '#121212', minHeight: '100vh' },
-  columnLeft: { flex: 3 },
-  columnRight: { flex: 1, background: '#1e1e1e', padding: '1.5rem', borderRadius: 8, height: 'fit-content', display: 'flex', flexDirection: 'column', gap: '1rem' },
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' },
-  heading: { margin: 0, fontSize: '1.6rem', fontWeight: 700 },
-  addBtn: { padding: '0.5rem 1rem', borderRadius: 8, border: 'none', background: '#00C800', fontWeight: 600, cursor: 'pointer' },
-  blogList: { display: 'flex', flexDirection: 'column', gap: '1.5rem' },
-  panelTitle: { fontSize: '1.2rem', fontWeight: 700, marginBottom: '0.5rem' },
-  label: { marginTop: '0.5rem', marginBottom: '0.25rem', fontWeight: 600 },
-  input: { width: '100%', padding: '0.5rem', borderRadius: 6, fontSize: '1rem', background: '#222', color: '#fff', border: '1px solid #444' },
-  select: { width: '100%', padding: '0.5rem', borderRadius: 6, fontSize: '1rem', background: '#222', color: '#fff', border: '1px solid #444' },
-  rangeGroup: { display: 'flex', alignItems: 'center' },
-  rangeInput: { width: '50%', padding: '0.5rem', borderRadius: 6, fontSize: '1rem', background: '#222', color: '#fff', border: '1px solid #444' },
-  resetBtn: { marginTop: '1rem', padding: '0.6rem', border: 'none', background: '#444', color: '#fff', fontWeight: 'bold', borderRadius: 6, cursor: 'pointer' },
-  pagination: { marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid #2a2a2a', display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '0.75rem', alignItems: 'center' },
-  pageInfo: { opacity: 0.85, fontSize: '0.95rem' },
-  pagerControls: { display: 'flex', gap: '0.5rem', alignItems: 'center' },
-  pagerBtn: { padding: '0.45rem 0.7rem', borderRadius: 6, border: '1px solid #333', background: '#1d1d1d', color: '#fff', cursor: 'pointer' },
-  pageNumber: { minWidth: 110, textAlign: 'center', opacity: 0.9 },
-  pageSizeWrap: { display: 'flex', alignItems: 'center', gap: '0.5rem', justifySelf: 'end' },
-  labelSmall: { fontSize: '0.9rem', opacity: 0.9 },
-  pageSizeSelect: { padding: '0.4rem 0.5rem', borderRadius: 6, background: '#222', color: '#fff', border: '1px solid #444' }
 }
 
 export default Blog

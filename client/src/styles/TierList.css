@@ -1,0 +1,157 @@
+/* client/src/styles/TierList.css */
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.spinner {
+    animation: spin 1.5s linear infinite;
+    font-size: 2rem;
+    color: #B89B72;
+}
+
+.tier-page-container {
+    padding: 2rem;
+    font-family: 'Cinzel', serif;
+    color: #EAEAEA;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.tier-page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.tier-page-title {
+    font-size: 3rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.2rem;
+    color: #B89B72;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.tier-row {
+    display: flex;
+    margin-bottom: 1.5rem;
+    background-color: rgba(16, 16, 16, 0.6);
+    border: 1px solid #444;
+    border-left: 5px solid #B89B72;
+    min-height: 120px;
+    align-items: stretch;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.tier-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #EAEAEA;
+    background-color: #101010;
+    padding: 1rem;
+    width: 100px;
+    flex-shrink: 0;
+    border-right: 2px solid #B89B72;
+    text-shadow: 2px 2px 2px #000;
+}
+
+.tier-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem;
+    align-items: center;
+}
+
+.tier-card {
+    width: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 0.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tier-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(184, 155, 114, 0.2);
+    border-color: #B89B72;
+}
+
+.tier-card-image {
+    width: 80px;
+    height: 112px;
+    object-fit: cover;
+    border-radius: 2px;
+    background-color: #333;
+}
+
+.tier-card-placeholder {
+    width: 80px;
+    height: 112px;
+    background-color: #333;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: #888;
+}
+
+.tier-card-title {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: #ccc;
+    line-height: 1.2;
+    word-break: break-word;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .tier-page-container {
+        padding: 1rem;
+    }
+
+    .tier-page-title {
+        font-size: 2rem;
+    }
+
+    .tier-row {
+        flex-direction: column;
+        border-left: 1px solid #444;
+        border-top: 5px solid #B89B72;
+    }
+
+    .tier-label {
+        width: 100%;
+        height: 60px;
+        border-right: none;
+        border-bottom: 2px solid #B89B72;
+        font-size: 2rem;
+    }
+
+    .tier-content {
+        justify-content: center;
+    }
+
+    .tier-card {
+        width: 80px;
+    }
+
+    .tier-card-image, .tier-card-placeholder {
+        width: 60px;
+        height: 84px;
+    }
+
+    .tier-card-title {
+        font-size: 0.7rem;
+    }
+}

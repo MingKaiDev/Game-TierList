@@ -7,6 +7,7 @@ const NewBlog = () => {
   const [summary, setSummary] = useState('')
   const [content, setContent] = useState('')
   const [gameplayTime, setGameplayTime] = useState('')
+  const [nsfw, setNsfw] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -16,6 +17,7 @@ const NewBlog = () => {
       summary,
       content,
       gameplayTime,
+      NSFW: nsfw,
     }
 
     try {
@@ -36,6 +38,7 @@ const NewBlog = () => {
       setSummary('')
       setContent('')
       setGameplayTime('')
+      setNsfw(false)
     } catch (err) {
       console.error('Failed to create blog:', err)
       
@@ -88,6 +91,18 @@ const NewBlog = () => {
           required
           style={styles.textarea}
         />
+        <div style={styles.checkboxContainer}>
+          <input
+            type="checkbox"
+            id="nsfw"
+            checked={nsfw}
+            onChange={(e) => setNsfw(e.target.checked)}
+            style={styles.checkbox}
+          />
+          <label htmlFor="nsfw" style={styles.checkboxLabel}>
+            NSFW Content (requires login to view)
+          </label>
+        </div>
         <button type="submit" style={styles.button}>Create Blog</button>
       </form>
     </div>
@@ -135,6 +150,21 @@ const styles = {
     background: '#00C800',
     color: 'white',
     fontWeight: 'bold',
+    fontSize: '1rem',
+    cursor: 'pointer',
+  },
+  checkboxContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+  },
+  checkbox: {
+    width: '18px',
+    height: '18px',
+    cursor: 'pointer',
+  },
+  checkboxLabel: {
+    color: 'white',
     fontSize: '1rem',
     cursor: 'pointer',
   },
