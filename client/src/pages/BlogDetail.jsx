@@ -4,6 +4,7 @@ import { DiscussionEmbed } from 'disqus-react';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { AuthCtx } from '../contexts/AuthContext';
 import useGameBanner from '../hooks/useGameBanner';
+import SkeletonLoader from '../components/SkeletonLoader';
 import '../styles/BlogDetail.css';
 
 const BlogDetail = () => {
