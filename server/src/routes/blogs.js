@@ -4,6 +4,13 @@ const { db } = require('../firebase')
 const fetch = require('node-fetch')
 const checkAuth = require('../middleware/checkAuth')
 const admin = require('firebase-admin')
+const NodeCache = require('node-cache');
+const blogCache = new NodeCache({ stdTTL: 300 }); // Cache for 5 minutes
+
+// Environment configuration
+const UAT_ENVIRONMENT = process.env.NODE_ENV !== 'production';
+const BLOG_COLLECTION = UAT_ENVIRONMENT ? 'blogs_uat' : 'blogs';
+console.log(`[INFO] Using Firestore collection: ${BLOG_COLLECTION}`);
 
 /* ───── IGDB Image Validator ───── */
 async function getCoverImageId(title) {
@@ -58,42 +65,62 @@ const verifyToken = async (req, res, next) => {
 /* ───── GET All Blogs ───── */
 router.get('/', async (req, res) => {
   try {
-    const { title } = req.query
-    const snapshot = await db.collection('blogs').get()
-    let blogs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    const { title } = req.query;
+    const cacheKey = `blogs_all`;
 
-    // Check if user is authenticated
-    let isAuthenticated = false
-    const authHeader = req.headers.authorization
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const idToken = authHeader.split(' ')[1]
-      try {
-        await admin.auth().verifyIdToken(idToken)
-        isAuthenticated = true
-      } catch (err) {
-        // User is not authenticated, continue with filtering
-      }
+    // Try to get data from cache first
+    if (blogCache.has(cacheKey)) {
+      let blogs = blogCache.get(cacheKey);
+      // Perform filtering on cached data
+      return filterAndRespond(req, res, blogs, title);
     }
 
-    // Filter out NSFW content if user is not authenticated
-    // Only authenticated users can see NSFW blogs
-    if (!isAuthenticated) {
-      blogs = blogs.filter(blog => blog.NSFW !== true)
-    }
+    // If not in cache, fetch from Firestore
+    const snapshot = await db.collection(BLOG_COLLECTION).get();
+    let blogs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    
+    // Store the full, unfiltered list in cache
+    blogCache.set(cacheKey, blogs);
 
-    if (title) {
-      const filtered = blogs.filter(b =>
-        b.title?.toLowerCase() === title.toLowerCase()
-      )
-      return res.json(filtered)
-    }
+    // Perform filtering and respond
+    return filterAndRespond(req, res, blogs, title);
 
-    res.json(blogs)
   } catch (err) {
-    console.error('Failed to fetch blogs:', err)
-    res.status(500).json({ error: 'Failed to fetch blogs' })
+    console.error('Failed to fetch blogs:', err);
+    res.status(500).json({ error: 'Failed to fetch blogs' });
   }
-})
+});
+
+// Helper function to handle filtering and response
+async function filterAndRespond(req, res, blogs, title) {
+  let isAuthenticated = false;
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const idToken = authHeader.split(' ')[1];
+    try {
+      await admin.auth().verifyIdToken(idToken);
+      isAuthenticated = true;
+    } catch (err) {
+      // Not authenticated
+    }
+  }
+
+  let blogsToReturn = [...blogs];
+
+  if (!isAuthenticated) {
+    blogsToReturn = blogsToReturn.filter(blog => blog.NSFW !== true);
+  }
+
+  if (title) {
+    const filtered = blogsToReturn.filter(b =>
+      b.title?.toLowerCase() === title.toLowerCase()
+    );
+    return res.json(filtered);
+  }
+
+  return res.json(blogsToReturn);
+}
+
 
 /* ───── POST Create Blog ───── */
 router.post('/',verifyToken, async (req, res) => {
@@ -111,7 +138,7 @@ router.post('/',verifyToken, async (req, res) => {
     //   return res.status(400).json({ error: 'Invalid title — no IGDB image found' })
     // }
 
-    const newDoc = await db.collection('blogs').add({
+    const newDoc = await db.collection(BLOG_COLLECTION).add({
       title,
       rating,
       content,
@@ -122,6 +149,7 @@ router.post('/',verifyToken, async (req, res) => {
       authorUid: uid,
     })
 
+    blogCache.del('blogs_all'); // Invalidate cache
     res.status(201).json({ id: newDoc.id })
   } catch (err) {
     console.error('Failed to create blog:', err)
@@ -135,7 +163,7 @@ router.patch('/:id', verifyToken, async (req, res) => {
   const { content, rating, gameplayTime, NSFW } = req.body
 
   try {
-    const blogRef = db.collection('blogs').doc(id)
+    const blogRef = db.collection(BLOG_COLLECTION).doc(id)
     const blogSnap = await blogRef.get()
 
     if (!blogSnap.exists) {
@@ -160,12 +188,41 @@ router.patch('/:id', verifyToken, async (req, res) => {
 
     await blogRef.update(updateData)
 
+    blogCache.del('blogs_all'); // Invalidate cache
     res.status(200).json({ success: true })
   } catch (err) {
     console.error('Blog update failed:', err)
     res.status(500).json({ error: 'Failed to update blog' })
   }
 })
+
+/* ───── DELETE Blog ───── */
+router.delete('/:id', verifyToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const blogRef = db.collection(BLOG_COLLECTION).doc(id);
+    const blogSnap = await blogRef.get();
+
+    if (!blogSnap.exists) {
+      return res.status(404).json({ error: 'Blog not found' });
+    }
+
+    const blog = blogSnap.data();
+    if (blog.authorUid !== req.user.uid) {
+      return res.status(403).json({ error: 'Forbidden: Not your blog' });
+    }
+
+    await blogRef.delete();
+    
+    blogCache.del('blogs_all'); // Invalidate cache
+    res.status(200).json({ success: true, message: 'Blog deleted' });
+
+  } catch (err) {
+    console.error('Blog delete failed:', err);
+    res.status(500).json({ error: 'Failed to delete blog' });
+  }
+});
 
 
 module.exports = router
