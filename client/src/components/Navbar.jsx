@@ -37,9 +37,10 @@ const Navbar = () => {
         }}>
           {navItem("/", "Home", location, isMobile)}
           {navItem("/blog", "Blog", location, isMobile)}
+          {navItem("/backlog", "Backlog", location, isMobile)}
           {navItem("/tierlist", isMobile ? "Tier" : "Tier List", location, isMobile)}
           {navItem("/compendium", "Compendium", location, isMobile)}
-          {navItem("/dashboard", "Dashboard", location, isMobile)}
+          {navItem("/dashboard", "Scribe", location, isMobile)}
         </div>
 
         {/* Center logo */}

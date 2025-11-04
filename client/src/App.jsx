@@ -9,6 +9,7 @@ import TierList from './pages/TierList';
 import NewBlog from './pages/NewBlog';
 import BlogDetail from './pages/BlogDetail';
 import EditBlog from './pages/EditBlog';
+import Backlog from './pages/Backlog';
 import { AuthCtx } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Compendium from './pages/Compendium';
@@ -47,6 +48,7 @@ const AnimatedRoutes = () => {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Home />} />
         <Route path="/blog" element={<Blog />} />
+  <Route path="/backlog" element={<Backlog />} />
         <Route path="/tierlist" element={<TierList />} />
         <Route path="/compendium" element={<Compendium />} />
         <Route path="/dashboard" element={<Dashboard />} />

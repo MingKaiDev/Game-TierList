@@ -6,6 +6,7 @@ const pingRoute = require('./routes/ping')
 const artworkRoute = require('./routes/artwork')
 const detailsRoute = require('./routes/details')
 const genresRoute = require('./routes/genres')
+const backlogRoute = require('./routes/backlog')
 
 require("dotenv").config();
 
@@ -26,6 +27,7 @@ app.use('/api/ping', pingRoute)
 app.use('/api/artwork', artworkRoute)
 app.use('/api/details', detailsRoute)
 app.use('/api/genres', genresRoute)
+app.use('/api/backlog', backlogRoute)
 
 app.get("/api/hello", (req, res) => {
   res.json({ message: "Hello from backend!" });
