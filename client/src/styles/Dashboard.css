@@ -46,3 +46,12 @@
   color: #EAEAEA;
   text-transform: uppercase;
 }
+
+.chart-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  color: #B89B72;
+  font-style: italic;
+}

@@ -1,6 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { getAuth } from 'firebase/auth';
-import { AuthCtx } from '../contexts/AuthContext';
+import React, { useState, useEffect } from 'react';
 import { Bar, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title } from 'chart.js';
 import SkeletonLoader from '../components/SkeletonLoader';
@@ -14,28 +12,39 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchDashboardData = async () => {
       setLoading(true);
+      
+      // Fetch blogs for rating distribution
       try {
-        const [blogsRes, genresRes] = await Promise.all([
-          fetch(`${import.meta.env.VITE_BACKEND_URL}/api/blogs`),
-          fetch(`${import.meta.env.VITE_BACKEND_URL}/api/genres`)
-        ]);
-        
-        const blogsData = await blogsRes.json();
-        const genresData = await genresRes.json();
-
-        setBlogs(blogsData);
-        setGenreDistribution(genresData);
-
+        const blogsRes = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/blogs`);
+        if (blogsRes.ok) {
+          const blogsData = await blogsRes.json();
+          setBlogs(blogsData);
+        } else {
+          console.error('Failed to fetch blogs for dashboard');
+        }
       } catch (err) {
-        console.error('Failed to fetch data for dashboard:', err);
-      } finally {
-        setLoading(false);
+        console.error('Error fetching blogs:', err);
       }
+
+      // Fetch genres for genre distribution
+      try {
+        const genresRes = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/genres`);
+        if (genresRes.ok) {
+          const genresData = await genresRes.json();
+          setGenreDistribution(genresData);
+        } else {
+          console.error('Failed to fetch genres for dashboard');
+        }
+      } catch (err) {
+        console.error('Error fetching genres:', err);
+      }
+
+      setLoading(false);
     };
 
-    fetchData();
+    fetchDashboardData();
   }, []);
 
   const ratingDistribution = blogs.reduce((acc, blog) => {
@@ -53,8 +62,7 @@ const Dashboard = () => {
             family: "'Cinzel', serif",
           }
         }
-      }
-    },
+      },
     scales: {
       x: {
         ticks: {
@@ -73,7 +81,7 @@ const Dashboard = () => {
         }
       }
     }
-  };
+  }};
 
   const ratingData = {
     labels: Object.keys(ratingDistribution).sort((a, b) => a - b),
@@ -103,7 +111,7 @@ const Dashboard = () => {
     return (
       <div className="dashboard-container">
         <header className="dashboard-header">
-          <h1 className="dashboard-title">Scribe's Dashboard</h1>
+          <h1 className="dashboard-title">Scribe Dashboard </h1>
         </header>
         <div className="charts-grid">
           <div className="chart-card"><SkeletonLoader type="card" style={{height: '300px'}}/></div>
@@ -122,11 +130,19 @@ const Dashboard = () => {
       <div className="charts-grid">
         <div className="chart-card">
           <h2 className="chart-title">Rating Distribution</h2>
-          <Bar data={ratingData} options={chartOptions} />
+          {blogs.length > 0 ? (
+            <Bar data={ratingData} options={chartOptions} />
+          ) : (
+            <p className="chart-placeholder">No rating data available.</p>
+          )}
         </div>
         <div className="chart-card">
           <h2 className="chart-title">Genre Distribution</h2>
-          <Pie data={genreData} options={{ plugins: { legend: { labels: { color: '#EAEAEA', font: { family: "'Cinzel', serif" } } } } }} />
+          {Object.keys(genreDistribution).length > 0 ? (
+            <Pie data={genreData} options={{ plugins: { legend: { labels: { color: '#EAEAEA', font: { family: "'Cinzel', serif" } } } } }} />
+          ) : (
+            <p className="chart-placeholder">No genre data available. The archives may be silent.</p>
+          )}
         </div>
       </div>
     </div>
