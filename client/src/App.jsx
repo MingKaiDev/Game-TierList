@@ -12,6 +12,7 @@ import EditBlog from './pages/EditBlog';
 import { AuthCtx } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Compendium from './pages/Compendium';
+import Dashboard from './pages/Dashboard';
 
 const backendURL = import.meta.env.VITE_BACKEND_URL;
 
@@ -48,6 +49,7 @@ const AnimatedRoutes = () => {
         <Route path="/blog" element={<Blog />} />
         <Route path="/tierlist" element={<TierList />} />
         <Route path="/compendium" element={<Compendium />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/newblog" element={<PrivateRoute><NewBlog /></PrivateRoute>} />
         <Route path="/EditBlog/:id" element={<PrivateRoute><EditBlog /></PrivateRoute>} />
         <Route path="/blog/:title" element={<BlogDetail />} />

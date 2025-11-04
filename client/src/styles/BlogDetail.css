@@ -37,6 +37,8 @@
 .tome-content {
     line-height: 1.8;
     font-size: 1.1rem;
+    margin-bottom: 3rem;
+    color: #EAEAEA;
     text-align: justify;
 }
 
@@ -101,6 +103,14 @@
 
 .discussion-section {
     margin-top: 4rem;
-    padding-top: 2rem;
-    border-top: 2px solid #B89B72;
+    padding: 2rem;
+    background-color: rgba(10, 10, 10, 0.5);
+    border: 1px solid #B89B72;
+    border-radius: 8px;
+}
+
+/* This is a global override, so it needs to be in a global stylesheet like App.css or index.css if it doesn't work here.
+   We will try adding it here first. */
+#disqus_thread {
+  background: transparent !important;
 }

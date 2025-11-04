@@ -1,0 +1,48 @@
+.dashboard-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Cinzel', serif;
+  color: #EAEAEA;
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.dashboard-title {
+  font-size: 3rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.2rem;
+  color: #B89B72;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.dashboard-subtitle {
+  font-size: 1.2rem;
+  color: #B89B72;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+}
+
+.chart-card {
+  padding: 2rem;
+  background-color: rgba(16, 16, 16, 0.8);
+  border: 1px solid #B89B72;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(184, 155, 114, 0.2);
+}
+
+.chart-title {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #EAEAEA;
+  text-transform: uppercase;
+}

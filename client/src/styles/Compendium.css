@@ -24,8 +24,8 @@
 
 .compendium-subtitle {
     font-size: 1.2rem;
-    color: #BDBDBD;
-    margin-top: 0.5rem;
+    color: #B89B72;
+    margin-bottom: 2rem;
 }
 
 .compendium-loading {
@@ -36,6 +36,65 @@
     font-size: 2rem;
     color: #B89B72;
     min-height: 70vh;
+}
+
+.compendium-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.search-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.search-icon {
+    position: absolute;
+    left: 15px;
+    color: #B89B72;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 0.8rem 1rem 0.8rem 2.5rem;
+    background-color: #101010;
+    border: 1px solid #B89B72;
+    color: #EAEAEA;
+    border-radius: 25px;
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.search-bar input:focus {
+    outline: none;
+    box-shadow: 0 0 10px rgba(184, 155, 114, 0.3);
+}
+
+.sort-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    border: 1px solid #B89B72;
+    border-radius: 25px;
+    background-color: transparent;
+    color: #B89B72;
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.sort-button:hover {
+    background-color: #B89B72;
+    color: #101010;
 }
 
 .compendium-grid {

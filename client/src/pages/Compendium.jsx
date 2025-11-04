@@ -1,14 +1,16 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useMemo, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAuth } from 'firebase/auth';
 import { AuthCtx } from '../contexts/AuthContext';
 import useGameCovers from '../hooks/useGameCovers';
-import { FaSpinner, FaImage } from 'react-icons/fa';
+import { FaSpinner, FaImage, FaSearch, FaSortAlphaDown, FaSortAlphaUp } from 'react-icons/fa';
 import '../styles/Compendium.css';
 
 const Compendium = () => {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState('asc'); // 'asc' or 'desc'
   const { user } = useContext(AuthCtx);
 
   useEffect(() => {
@@ -31,9 +33,6 @@ const Compendium = () => {
         // Get unique games, preserving the original blog object for linking
         const uniqueGames = Array.from(new Map(blogs.map(blog => [blog.title, blog])).values());
         
-        // Sort games alphabetically by title
-        uniqueGames.sort((a, b) => a.title.localeCompare(b.title));
-
         setGames(uniqueGames);
       } catch (err) {
         console.error('Failed to fetch games for compendium:', err);
@@ -44,6 +43,17 @@ const Compendium = () => {
 
     fetchGames();
   }, [user]);
+
+  const filteredAndSortedGames = useMemo(() => {
+    return games
+      .filter(game => game.title.toLowerCase().includes(searchTerm.toLowerCase()))
+      .sort((a, b) => {
+        if (sortOrder === 'asc') {
+          return a.title.localeCompare(b.title);
+        }
+        return b.title.localeCompare(a.title);
+      });
+  }, [games, searchTerm, sortOrder]);
 
   if (loading) {
     return (
@@ -59,9 +69,24 @@ const Compendium = () => {
       <header className="compendium-header">
         <h1 className="compendium-title">Game Compendium</h1>
         <p className="compendium-subtitle">A library of all chronicled games.</p>
+        <div className="compendium-controls">
+          <div className="search-bar">
+            <FaSearch className="search-icon" />
+            <input
+              type="text"
+              placeholder="Search for a game..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <button className="sort-button" onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}>
+            {sortOrder === 'asc' ? <FaSortAlphaDown /> : <FaSortAlphaUp />}
+            <span>Sort</span>
+          </button>
+        </div>
       </header>
       <div className="compendium-grid">
-        {games.map(game => (
+        {filteredAndSortedGames.map(game => (
           <GameCard key={game.id} game={game} />
         ))}
       </div>
