@@ -9,6 +9,11 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarEle
 const Dashboard = () => {
   const [blogs, setBlogs] = useState([]);
   const [genreDistribution, setGenreDistribution] = useState({});
+  const [averageHours, setAverageHours] = useState(0);
+  const [grandTotalHours, setGrandTotalHours] = useState(0);
+  const [years, setYears] = useState([]);
+  const [selectedYear, setSelectedYear] = useState('all');
+  const [totalHoursByYear, setTotalHoursByYear] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,6 +26,32 @@ const Dashboard = () => {
         if (blogsRes.ok) {
           const blogsData = await blogsRes.json();
           setBlogs(blogsData);
+            // compute playtime stats client-side
+            try {
+              const playtimeEntries = blogsData
+                .map(b => ({
+                  hours: Number(b.gameplayTime) || 0,
+                  year: b.date ? new Date(b.date).getFullYear() : null,
+                }))
+                .filter(e => e.hours > 0);
+
+              const total = playtimeEntries.reduce((s, e) => s + e.hours, 0);
+              const avg = playtimeEntries.length > 0 ? total / playtimeEntries.length : 0;
+              const yrs = [...new Set(playtimeEntries.map(e => e.year).filter(Boolean))].sort((a,b)=>b-a);
+
+              setGrandTotalHours(total);
+              setAverageHours(Number(avg.toFixed(2)));
+              setYears(yrs);
+              // default total for selectedYear
+              if (selectedYear === 'all') {
+                setTotalHoursByYear(total);
+              } else {
+                const yTotal = playtimeEntries.filter(e => e.year === Number(selectedYear)).reduce((s,e)=>s+e.hours,0);
+                setTotalHoursByYear(yTotal);
+              }
+            } catch (err) {
+              console.error('Error computing playtime stats:', err);
+            }
         } else {
           console.error('Failed to fetch blogs for dashboard');
         }
@@ -46,6 +77,19 @@ const Dashboard = () => {
 
     fetchDashboardData();
   }, []);
+
+  // recompute totalHoursByYear when selectedYear or blogs change
+  useEffect(() => {
+    const playtimeEntries = blogs
+      .map(b => ({ hours: Number(b.gameplayTime) || 0, year: b.date ? new Date(b.date).getFullYear() : null }))
+      .filter(e => e.hours > 0);
+
+    if (selectedYear === 'all') {
+      setTotalHoursByYear(playtimeEntries.reduce((s, e) => s + e.hours, 0));
+    } else {
+      setTotalHoursByYear(playtimeEntries.filter(e => e.year === Number(selectedYear)).reduce((s, e) => s + e.hours, 0));
+    }
+  }, [selectedYear, blogs]);
 
   const ratingDistribution = blogs.reduce((acc, blog) => {
     const rating = Math.floor(blog.rating);
@@ -127,6 +171,32 @@ const Dashboard = () => {
         <h1 className="dashboard-title">Scribe's Dashboard</h1>
         <p className="dashboard-subtitle">An overview of your chronicles.</p>
       </header>
+      <div className="hours-stats">
+        <div className="hours-card">
+          <h3>Average Hours Played</h3>
+          <p className="hours-value">{averageHours}</p>
+          <small className="muted">Average across entries with recorded hours</small>
+        </div>
+        <div className="hours-card">
+          <h3>Total Hours{selectedYear !== 'all' ? ` — ${selectedYear}` : ''}</h3>
+          <p className="hours-value">{totalHoursByYear}</p>
+          <div className="year-select">
+            <label htmlFor="year">Year:</label>
+            <select id="year" value={selectedYear} onChange={e => setSelectedYear(e.target.value)}>
+              <option value="all">All</option>
+              {years.map(y => (
+                <option value={y} key={y}>{y}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="hours-card">
+          <h3>Grand Total Hours</h3>
+          <p className="hours-value">{grandTotalHours}</p>
+          <small className="muted">Sum of all recorded gameplayTime</small>
+        </div>
+      </div>
+
       <div className="charts-grid">
         <div className="chart-card">
           <h2 className="chart-title">Rating Distribution</h2>
